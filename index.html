@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V2 RP KURUL PANELİ</title>
+    <title>Ana Karargah</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -23,9 +25,7 @@
             --warning: #f59e0b;
             --info: #3b82f6;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
@@ -33,7 +33,6 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-
         .bg-orb {
             position: fixed;
             border-radius: 50%;
@@ -45,22 +44,18 @@
         .orb-1 { width: 400px; height: 400px; background: #8b5cf6; top: -100px; left: -100px; animation: float 8s ease-in-out infinite; }
         .orb-2 { width: 300px; height: 300px; background: #3b82f6; bottom: -50px; right: -50px; animation: float 10s ease-in-out infinite reverse; }
         .orb-3 { width: 250px; height: 250px; background: #a855f7; top: 40%; left: 60%; animation: float 12s ease-in-out infinite; }
-
         @keyframes float {
             0%, 100% { transform: translate(0, 0); }
             50% { transform: translate(30px, -30px); }
         }
-
         .glass {
             background: rgba(22, 22, 31, 0.8);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: 16px;
         }
-
         .app-container { display: none; position: relative; z-index: 1; min-height: 100vh; }
         .app-container.active { display: flex; }
-
         .sidebar {
             width: 260px;
             background: var(--bg-secondary);
@@ -71,12 +66,7 @@
             height: 100vh;
             z-index: 100;
         }
-
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border); }
         .logo {
             font-size: 20px;
             font-weight: 800;
@@ -87,11 +77,8 @@
             align-items: center;
             gap: 10px;
         }
-
         .logo i { font-size: 24px; -webkit-text-fill-color: #8b5cf6; }
-
         .nav-menu { padding: 16px 12px; flex: 1; overflow-y: auto; }
-
         .nav-item {
             display: flex;
             align-items: center;
@@ -105,12 +92,9 @@
             font-weight: 500;
             font-size: 14px;
         }
-
         .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
         .nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-light); border: 1px solid rgba(139, 92, 246, 0.3); }
-
         .nav-item i { width: 20px; text-align: center; }
-
         .user-card {
             padding: 16px;
             border-top: 1px solid var(--border);
@@ -118,7 +102,6 @@
             align-items: center;
             gap: 12px;
         }
-
         .user-avatar {
             width: 40px; height: 40px;
             border-radius: 10px;
@@ -126,28 +109,18 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 16px;
         }
-
         .user-info { flex: 1; }
         .user-name { font-weight: 600; font-size: 14px; }
         .user-role { font-size: 12px; color: var(--accent-light); }
-
         .main-content {
             margin-left: 260px;
             flex: 1;
             padding: 32px;
             max-width: calc(100vw - 260px);
         }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-        }
-
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
         .page-title { font-size: 28px; font-weight: 700; }
         .page-subtitle { color: var(--text-secondary); margin-top: 4px; font-size: 14px; }
-
         .btn {
             padding: 10px 20px;
             border-radius: 10px;
@@ -161,22 +134,18 @@
             align-items: center;
             gap: 8px;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             color: white;
             box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
         }
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4); }
-
         .btn-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
         .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
         .btn-outline:hover { border-color: var(--accent); color: var(--accent-light); }
         .btn-outline.active { border-color: var(--accent); color: var(--accent-light); background: rgba(139, 92, 246, 0.1); }
-
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px; }
-
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -185,7 +154,6 @@
             transition: all 0.3s;
         }
         .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
-
         .stat-icon {
             width: 48px; height: 48px;
             border-radius: 12px;
@@ -197,11 +165,9 @@
         .stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: var(--info); }
         .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .stat-icon.orange { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-
         .stat-value { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
         .stat-label { color: var(--text-secondary); font-size: 14px; }
-
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
         .form-label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-secondary); }
         .form-input, .form-select, .form-textarea {
             width: 100%;
@@ -220,7 +186,6 @@
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
         .form-textarea { min-height: 120px; resize: vertical; }
-
         .auth-container {
             display: flex;
             align-items: center;
@@ -229,13 +194,7 @@
             position: relative;
             z-index: 1;
         }
-
-        .auth-box {
-            width: 100%;
-            max-width: 440px;
-            padding: 40px;
-        }
-
+        .auth-box { width: 100%; max-width: 440px; padding: 40px; }
         .auth-title {
             font-size: 32px;
             font-weight: 800;
@@ -245,9 +204,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .auth-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 32px; font-size: 14px; }
-
         .auth-tabs {
             display: flex;
             gap: 8px;
@@ -256,7 +213,6 @@
             padding: 4px;
             border-radius: 10px;
         }
-
         .auth-tab {
             flex: 1;
             padding: 10px;
@@ -272,16 +228,13 @@
             font-family: inherit;
         }
         .auth-tab.active { background: var(--accent); color: white; }
-
         .hint-text { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
-
         .table-container { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         thead { background: var(--bg-secondary); }
         th { padding: 14px 16px; text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         td { padding: 14px 16px; border-top: 1px solid var(--border); color: var(--text-primary); }
         tr:hover { background: rgba(255,255,255,0.02); }
-
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
@@ -292,7 +245,6 @@
         .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .badge-approved { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .badge-rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-
         .leaderboard-item {
             display: flex;
             align-items: center;
@@ -305,7 +257,6 @@
             transition: all 0.2s;
         }
         .leaderboard-item:hover { border-color: var(--accent); }
-
         .rank-num {
             width: 36px; height: 36px;
             border-radius: 10px;
@@ -317,12 +268,10 @@
         .rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
         .rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
         .rank-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
-
         .lb-info { flex: 1; }
         .lb-name { font-weight: 600; margin-bottom: 2px; }
         .lb-detail { font-size: 12px; color: var(--text-secondary); }
         .lb-score { font-weight: 700; font-size: 18px; color: var(--accent-light); }
-
         .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 12px; }
         .photo-item {
             aspect-ratio: 1;
@@ -353,7 +302,6 @@
             font-size: 24px;
         }
         .photo-add:hover { border-color: var(--accent); color: var(--accent-light); }
-
         .announcement-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -372,7 +320,6 @@
         .ann-scope { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 8px; }
         .scope-general { background: rgba(59, 130, 246, 0.15); color: var(--info); }
         .scope-kurul { background: rgba(139, 92, 246, 0.15); color: var(--accent-light); }
-
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.7);
@@ -400,7 +347,6 @@
         .modal-close { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-hover); border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .modal-body { padding: 24px; }
         .modal-footer { padding: 0 24px 24px; display: flex; justify-content: flex-end; gap: 10px; }
-
         .toast-container { position: fixed; top: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .toast {
             background: var(--bg-card);
@@ -419,29 +365,152 @@
         .toast-info .toast-icon { color: var(--info); }
         .toast-title { font-weight: 600; font-size: 14px; }
         .toast-msg { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
         .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
         .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: relative; }
             .main-content { margin-left: 0; max-width: 100%; padding: 20px; }
             .app-container.active { flex-direction: column; }
         }
-
         .hidden { display: none !important; }
-
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
         .fade-in { animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
         .section-title i { color: var(--accent-light); }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background: var(--bg-hover); color: var(--accent-light); }
+        .autocomplete-item strong { color: var(--text-primary); }
+        .autocomplete-item small { color: var(--text-secondary); font-size: 12px; }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .chat-message.own {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-message.other {
+            align-self: flex-start;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-meta {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .chat-input-area input:focus { outline: none; border-color: var(--accent); }
+        .chat-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .chat-tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .chat-tab:hover { border-color: var(--accent); color: var(--accent-light); }
+        .chat-tab.active {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-light);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .log-item {
+            padding: 14px 16px;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent);
+            font-size: 14px;
+        }
+        .log-time { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .loading-overlay {
+            position: fixed; inset: 0; background: rgba(10,10,15,0.9);
+            z-index: 5000; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 16px;
+        }
+        .loading-overlay.hidden { display: none !important; }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -450,12 +519,17 @@
     <div class="bg-orb orb-2"></div>
     <div class="bg-orb orb-3"></div>
 
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="color: var(--text-secondary); font-size: 14px;">Firebase'e bağlanılıyor...</div>
+    </div>
+
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- AUTH -->
     <div class="auth-container" id="authContainer">
         <div class="auth-box glass">
-            <div class="auth-title">V2 RP KURUL PANELİ</div>
+            <div class="auth-title">Ana Karargah</div>
             <div class="auth-subtitle">Hesabınıza giriş yapın veya kayıt olun</div>
 
             <div class="auth-tabs">
@@ -478,14 +552,11 @@
             </form>
 
             <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-                <div class="form-group">
+                <div class="form-group" style="position:relative;">
                     <label class="form-label">Kullanıcı Adı (@sabachka)</label>
-                    <input type="text" class="form-input" id="regUsername" placeholder="Örn: @furkan" required>
-                    <div class="hint-text">Kamptaki isminizle aynı olsun</div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Roblox Nickname</label>
-                    <input type="text" class="form-input" id="regName" placeholder="Roblox kullanıcı adınız" required>
+                    <input type="text" class="form-input" id="regUsername" placeholder="Örn: @furkan" required oninput="checkExistingUser(this.value)" autocomplete="off">
+                    <div id="regUserCheck" style="margin-top:6px; font-size:13px;"></div>
+                    <div id="regAutocomplete" class="autocomplete-dropdown hidden"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Şifre</label>
@@ -511,7 +582,7 @@
     <div class="app-container" id="appContainer">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-shield-halved"></i> V2 RP KURUL</div>
+                <div class="logo"><i class="fas fa-shield-halved"></i> Ana Karargah</div>
             </div>
 
             <nav class="nav-menu">
@@ -532,6 +603,12 @@
                 </div>
                 <div class="nav-item" onclick="navigate('announcements')" id="nav-announcements">
                     <i class="fas fa-bullhorn"></i> Duyurular
+                </div>
+                <div class="nav-item hidden" onclick="navigate('chat')" id="nav-chat">
+                    <i class="fas fa-comments"></i> Kurul Sohbeti
+                </div>
+                <div class="nav-item hidden" onclick="navigate('logs')" id="nav-logs">
+                    <i class="fas fa-history"></i> Loglar
                 </div>
                 <div class="nav-item hidden" onclick="navigate('admin')" id="nav-admin">
                     <i class="fas fa-users-cog"></i> Yetkilendirme
@@ -585,7 +662,7 @@
                         <div class="form-group">
                             <label class="form-label">Rapor Tarihi</label>
                             <input type="date" class="form-input" id="reportDate" required>
-                            <div class="hint-text">Sadece son 30 gün içindeki tarihleri seçebilirsiniz. Raporlar sadece 21:00-22:00 arasında atılabilir.</div>
+                            <div class="hint-text">Sadece son 30 gün içindeki tarihleri seçebilirsiniz.</div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Aktif Kalınan Süre</label>
@@ -634,7 +711,7 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Tarih</th><th>Süre</th><th>İcraat</th><th>Kanıt</th><th>Durum</th><th>İşlem</th></tr>
+                            <tr><th>Rapor ID</th><th>Sıra</th><th>Tarih</th><th>Süre</th><th>İcraat</th><th>Kanıt</th><th>Durum</th><th>İşlem</th></tr>
                         </thead>
                         <tbody id="myReportsTable"></tbody>
                     </table>
@@ -652,7 +729,7 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Personel</th><th>Tarih</th><th>Süre</th><th>İcraat</th><th>Kanıt</th><th>Durum</th><th>İşlem</th></tr>
+                            <tr><th>Rapor ID</th><th>Personel</th><th>Tarih</th><th>Süre</th><th>İcraat</th><th>Kanıt</th><th>Durum</th><th>İşlem</th></tr>
                         </thead>
                         <tbody id="approvalTable"></tbody>
                     </table>
@@ -698,6 +775,35 @@
                 <div id="announcementsList"></div>
             </div>
 
+            <!-- CHAT -->
+            <div id="page-chat" class="page hidden fade-in">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Kurul Sohbeti</div>
+                        <div class="page-subtitle">Kurulunuzla iletişimde kalın</div>
+                    </div>
+                </div>
+                <div class="chat-tabs" id="chatTabs"></div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                        <button class="btn btn-primary" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOGS -->
+            <div id="page-logs" class="page hidden fade-in">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Loglar</div>
+                        <div class="page-subtitle">Rapor onay/red geçmişi</div>
+                    </div>
+                </div>
+                <div id="logsContainer"></div>
+            </div>
+
             <!-- ADMIN -->
             <div id="page-admin" class="page hidden fade-in">
                 <div class="page-header">
@@ -708,14 +814,12 @@
                 </div>
                 <div class="glass" style="padding: 24px; margin-bottom: 24px;">
                     <div class="section-title"><i class="fas fa-user-plus"></i> Yeni Personel Ekle</div>
-                    <form id="addUserForm" onsubmit="addUser(event)" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end;">
-                        <div>
+                    <form id="addUserForm" onsubmit="addUser(event)" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end;">
+                        <div style="position:relative;">
                             <label class="form-label">Kullanıcı Adı</label>
-                            <input type="text" class="form-input" id="newUserUsername" placeholder="@kullanici" required>
-                        </div>
-                        <div>
-                            <label class="form-label">Roblox Nickname</label>
-                            <input type="text" class="form-input" id="newUserName" placeholder="Roblox Nickname" required>
+                            <input type="text" class="form-input" id="newUserUsername" placeholder="@kullanici" required oninput="adminSearchUser(this.value)" autocomplete="off">
+                            <div id="adminAutocomplete" class="autocomplete-dropdown hidden"></div>
+                            <div id="adminUserCheck" style="margin-top:6px; font-size:13px;"></div>
                         </div>
                         <div>
                             <label class="form-label">Rol</label>
@@ -737,7 +841,7 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Kullanıcı</th><th>Ad Soyad</th><th>Rol</th><th>Kurul</th><th>İşlem</th></tr>
+                            <tr><th>Kullanıcı</th><th>Rol</th><th>Kurul</th><th>İşlem</th></tr>
                         </thead>
                         <tbody id="usersTable"></tbody>
                     </table>
@@ -797,6 +901,21 @@
     </div>
 
     <script>
+        // ================= FIREBASE INIT =================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBElo6okuo07brFkQGkqu9P48wOX8pWDOI",
+            authDomain: "rapor-sistemi-d6294.firebaseapp.com",
+            databaseURL: "https://rapor-sistemi-d6294-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "rapor-sistemi-d6294",
+            storageBucket: "rapor-sistemi-d6294.firebasestorage.app",
+            messagingSenderId: "429224825357",
+            appId: "1:429224825357:web:b6d13947882f36a400bb44",
+            measurementId: "G-JCJVTR6QRZ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         // ================= DATA =================
         const ROLES = {
             karargah: { label: 'Karargah Sorumlusu', kurul: 'Tümü', level: 4 },
@@ -808,55 +927,100 @@
             byk_personel: { label: 'BYK Personeli', kurul: 'BYK', level: 1 }
         };
 
+        const CHAT_CHANNELS = {
+            AYK: { label: 'AYK Chat', icon: 'fa-shield-alt' },
+            ÜYK: { label: 'ÜYK Chat', icon: 'fa-crown' },
+            BYK: { label: 'BYK Chat', icon: 'fa-star' }
+        };
+
         let currentUser = null;
         let users = [];
         let reports = [];
         let announcements = [];
-
-        // Load from localStorage safely
-        try {
-            let storedUsers = localStorage.getItem('rp_users');
-            let storedReports = localStorage.getItem('rp_reports');
-            let storedAnnouncements = localStorage.getItem('rp_announcements');
-
-            if (storedUsers) {
-                let parsed = JSON.parse(storedUsers);
-                if (Array.isArray(parsed) && parsed.length > 0) users = parsed;
-            }
-            if (storedReports) {
-                let parsed = JSON.parse(storedReports);
-                if (Array.isArray(parsed)) reports = parsed;
-            }
-            if (storedAnnouncements) {
-                let parsed = JSON.parse(storedAnnouncements);
-                if (Array.isArray(parsed)) announcements = parsed;
-            }
-        } catch (e) {
-            console.error('Error loading data:', e);
-        }
+        let logs = [];
+        let chats = { AYK: [], ÜYK: [], BYK: [] };
+        let nextReportId = 1;
+        let currentChatChannel = null;
         let tempPhotos = [];
         let annFilter = 'all';
 
-        // Initialize default data if empty
-        function initData() {
-            // Ensure arrays are initialized properly
-            if (!users || !Array.isArray(users) || users.length === 0) {
-                users = [
+        // ================= FIREBASE SYNC =================
+        function initFirebaseSync() {
+            db.ref('users').on('value', snap => {
+                users = snap.val() ? Object.values(snap.val()) : [];
+                if (currentPage === 'admin') renderAdmin();
+                if (currentPage === 'approval') renderApproval();
+                if (currentPage === 'dashboard') renderDashboard();
+                if (currentPage === 'leaderboard') renderLeaderboard();
+            });
+
+            db.ref('reports').on('value', snap => {
+                reports = snap.val() ? Object.values(snap.val()) : [];
+                if (currentPage === 'approval') renderApproval();
+                if (currentPage === 'myreports') renderMyReports();
+                if (currentPage === 'dashboard') renderDashboard();
+                if (currentPage === 'leaderboard') renderLeaderboard();
+            });
+
+            db.ref('announcements').on('value', snap => {
+                announcements = snap.val() ? Object.values(snap.val()) : [];
+                if (currentPage === 'announcements') renderAnnouncements(annFilter);
+                if (currentPage === 'dashboard') renderDashboard();
+            });
+
+            db.ref('logs').on('value', snap => {
+                logs = snap.val() ? Object.values(snap.val()) : [];
+                if (currentPage === 'logs') renderLogs();
+            });
+
+            db.ref('chats').on('value', snap => {
+                if (snap.val()) chats = snap.val();
+                else chats = { AYK: [], ÜYK: [], BYK: [] };
+                if (currentPage === 'chat') renderChatMessages();
+            });
+
+            db.ref('nextReportId').on('value', snap => {
+                nextReportId = snap.val() || 1;
+            });
+        }
+
+        function saveUsers() { db.ref('users').set(arrayToObject(users)); }
+        function saveReports() { db.ref('reports').set(arrayToObject(reports)); }
+        function saveAnnouncements() { db.ref('announcements').set(arrayToObject(announcements)); }
+        function saveLogs() { db.ref('logs').set(arrayToObject(logs)); }
+        function saveChats() { db.ref('chats').set(chats); }
+        function saveNextReportId() { db.ref('nextReportId').set(nextReportId); }
+
+        function arrayToObject(arr) {
+            const obj = {};
+            arr.forEach((item, idx) => { if (item && item.id !== undefined) obj[item.id] = item; else obj[idx] = item; });
+            return obj;
+        }
+
+        // ================= INIT DATA =================
+        async function initData() {
+            const usersSnap = await db.ref('users').once('value');
+            if (!usersSnap.val()) {
+                const defaultUsers = [
                     { id: 1, username: '@berkcan', name: 'Berkcan', password: '2013', role: 'karargah', createdAt: Date.now() },
                     { id: 2, username: '@furkan', name: 'Furkan', password: '1234', role: 'ayk_sorumlu', createdAt: Date.now() },
                     { id: 3, username: '@ahmet', name: 'Ahmet', password: '1234', role: 'ayk_personel', createdAt: Date.now() },
                     { id: 4, username: '@mehmet', name: 'Mehmet', password: '1234', role: 'uyk_personel', createdAt: Date.now() },
-                    { id: 5, username: '@can', name: 'Can', password: '1234', role: 'byk_personel', createdAt: Date.now() }
+                    { id: 5, username: '@can', name: 'Can', password: '1234', role: 'byk_personel', createdAt: Date.now() },
+                    { id: 6, username: '@cahat', name: 'Cahat', password: '1234', role: 'ayk_personel', createdAt: Date.now() }
                 ];
-                saveUsers();
+                await db.ref('users').set(arrayToObject(defaultUsers));
             }
-            if (!reports || !Array.isArray(reports)) { reports = []; saveReports(); }
-            if (!announcements || !Array.isArray(announcements)) { announcements = []; saveAnnouncements(); }
-        }
 
-        function saveUsers() { localStorage.setItem('rp_users', JSON.stringify(users)); }
-        function saveReports() { localStorage.setItem('rp_reports', JSON.stringify(reports)); }
-        function saveAnnouncements() { localStorage.setItem('rp_announcements', JSON.stringify(announcements)); }
+            const nextIdSnap = await db.ref('nextReportId').once('value');
+            if (!nextIdSnap.val()) await db.ref('nextReportId').set(1);
+
+            const chatsSnap = await db.ref('chats').once('value');
+            if (!chatsSnap.val()) await db.ref('chats').set({ AYK: [], ÜYK: [], BYK: [] });
+
+            initFirebaseSync();
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
 
         // ================= AUTH =================
         function switchAuthTab(tab) {
@@ -883,7 +1047,6 @@
         function handleRegister(e) {
             e.preventDefault();
             const username = document.getElementById('regUsername').value.trim();
-            const name = document.getElementById('regName').value.trim();
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
 
@@ -896,7 +1059,9 @@
                 return;
             }
 
-            users.push({ id: Date.now(), username, name, password, role, createdAt: Date.now() });
+            const name = username.replace('@', '');
+            const newUser = { id: Date.now(), username, name, password, role, createdAt: Date.now() };
+            users.push(newUser);
             saveUsers();
             showToast('success', 'Kayıt Başarılı', 'Hesabınız oluşturuldu. Giriş yapabilirsiniz.');
             switchAuthTab('login');
@@ -908,6 +1073,53 @@
             document.getElementById('authContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
             showToast('info', 'Çıkış Yapıldı', 'Güvenli bir şekilde çıkış yaptınız.');
+        }
+
+        // ================= AUTOCOMPLETE =================
+        function checkExistingUser(val) {
+            const checkDiv = document.getElementById('regUserCheck');
+            const dropdown = document.getElementById('regAutocomplete');
+            if (!val || val.length < 2) { checkDiv.innerHTML = ''; dropdown.classList.add('hidden'); return; }
+
+            const matches = users.filter(u => u.username.toLowerCase().includes(val.toLowerCase()));
+            if (matches.length > 0) {
+                checkDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> Bu isimde kayıtlı kişi var!</span>';
+                let html = matches.map(u => `<div class="autocomplete-item" onclick="fillRegUser('${u.username}')"><strong>${u.username}</strong> <small>— ${u.name} (${ROLES[u.role].label})</small></div>`).join('');
+                dropdown.innerHTML = html;
+                dropdown.classList.remove('hidden');
+            } else {
+                checkDiv.innerHTML = '<span style="color:var(--success);"><i class="fas fa-check-circle"></i> Bu isim kullanılabilir.</span>';
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function fillRegUser(username) {
+            document.getElementById('regUsername').value = username;
+            document.getElementById('regAutocomplete').classList.add('hidden');
+            checkExistingUser(username);
+        }
+
+        function adminSearchUser(val) {
+            const dropdown = document.getElementById('adminAutocomplete');
+            const checkDiv = document.getElementById('adminUserCheck');
+            if (!val || val.length < 2) { dropdown.classList.add('hidden'); checkDiv.innerHTML = ''; return; }
+
+            const matches = users.filter(u => u.username.toLowerCase().includes(val.toLowerCase()));
+            if (matches.length > 0) {
+                checkDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> Bu isimde kayıtlı kişi var!</span>';
+                let html = matches.map(u => `<div class="autocomplete-item" onclick="fillAdminUser('${u.username}')"><strong>${u.username}</strong> <small>— ${u.name} (${ROLES[u.role].label})</small></div>`).join('');
+                dropdown.innerHTML = html;
+                dropdown.classList.remove('hidden');
+            } else {
+                checkDiv.innerHTML = '<span style="color:var(--success);"><i class="fas fa-check-circle"></i> Yeni kullanıcı eklenebilir.</span>';
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function fillAdminUser(username) {
+            document.getElementById('newUserUsername').value = username;
+            document.getElementById('adminAutocomplete').classList.add('hidden');
+            adminSearchUser(username);
         }
 
         // ================= APP INIT =================
@@ -926,12 +1138,16 @@
             document.getElementById('nav-admin').classList.toggle('hidden', !isAdmin);
             document.getElementById('nav-approval').classList.toggle('hidden', !canApprove);
             document.getElementById('btnNewAnnouncement').classList.toggle('hidden', !canWriteAnn);
+            document.getElementById('nav-logs').classList.toggle('hidden', !isAdmin);
+            document.getElementById('nav-chat').classList.toggle('hidden', false);
 
             navigate('dashboard');
         }
 
         // ================= NAVIGATION =================
+        let currentPage = 'dashboard';
         function navigate(page) {
+            currentPage = page;
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
             document.getElementById('page-' + page).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -944,10 +1160,13 @@
             if (page === 'leaderboard') renderLeaderboard();
             if (page === 'announcements') renderAnnouncements('all');
             if (page === 'admin') renderAdmin();
+            if (page === 'chat') initChat();
+            if (page === 'logs') renderLogs();
         }
 
         // ================= DASHBOARD =================
         function renderDashboard() {
+            if (!currentUser) return;
             const userReports = reports.filter(r => r.userId === currentUser.id);
             const approved = userReports.filter(r => r.status === 'approved');
             const pending = userReports.filter(r => r.status === 'pending');
@@ -977,7 +1196,6 @@
                 </div>
             `;
 
-            // Weekly chart
             const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
             const today = new Date();
             let chartHtml = '';
@@ -1011,7 +1229,6 @@
             }
             document.getElementById('weeklyChart').innerHTML = chartHtml;
 
-            // Recent announcements
             const recent = announcements.slice(-3).reverse();
             if (recent.length === 0) {
                 document.getElementById('dashboardAnnouncements').innerHTML = `
@@ -1066,18 +1283,6 @@
 
         function submitReport(e) {
             e.preventDefault();
-
-            // Saat kısıtlaması: Sadece 21:00-22:00 arası rapor atılabilir
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            const currentTime = currentHour + (currentMinute / 60);
-
-            if (currentTime < 21 || currentTime >= 22) {
-                showToast('error', 'Saat Kısıtlaması', 'Raporlar sadece 21:00 - 22:00 arasında atılabilir! Şu anki saat: ' + currentHour.toString().padStart(2, '0') + ':' + currentMinute.toString().padStart(2, '0'));
-                return;
-            }
-
             const date = document.getElementById('reportDate').value;
             const hours = document.getElementById('reportHours').value;
             const icraatText = document.getElementById('reportIcraat').value;
@@ -1094,8 +1299,12 @@
                 return;
             }
 
+            const reportId = nextReportId;
+            nextReportId++;
+            saveNextReportId();
+
             reports.push({
-                id: Date.now(),
+                id: reportId,
                 userId: currentUser.id,
                 username: currentUser.username,
                 name: currentUser.name,
@@ -1116,11 +1325,10 @@
             e.target.reset();
             tempPhotos = [];
             renderPhotoGrid();
-            showToast('success', 'Rapor Gönderildi', 'Raporunuz onaya gönderildi.');
+            showToast('success', 'Rapor Gönderildi', 'Raporunuz (ID: #' + reportId + ') onaya gönderildi.');
             navigate('myreports');
         }
 
-        // Set date constraints
         const dateInput = document.getElementById('reportDate');
         const todayStr = new Date().toISOString().split('T')[0];
         const thirtyDaysAgo = new Date();
@@ -1131,16 +1339,19 @@
 
         // ================= MY REPORTS =================
         function renderMyReports() {
+            if (!currentUser) return;
             const myReports = reports.filter(r => r.userId === currentUser.id).sort((a,b) => b.createdAt - a.createdAt);
             const tbody = document.getElementById('myReportsTable');
 
             if (myReports.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>Henüz rapor yok</h3><p>İlk raporunuzu göndermek için "Rapor At" sayfasına gidin.</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-folder-open"></i><h3>Henüz rapor yok</h3><p>İlk raporunuzu göndermek için "Rapor At" sayfasına gidin.</p></div></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = myReports.map(r => `
+            tbody.innerHTML = myReports.map((r, idx) => `
                 <tr>
+                    <td><strong>#${r.id}</strong></td>
+                    <td>${myReports.length - idx}. Rapor</td>
                     <td>${formatDate(r.date)}</td>
                     <td>${r.hours} Saat</td>
                     <td>${r.icraatlar.length}</td>
@@ -1157,6 +1368,7 @@
 
         // ================= APPROVAL =================
         function renderApproval() {
+            if (!currentUser) return;
             const userKurul = ROLES[currentUser.role].kurul;
             let pending = [];
             if (currentUser.role === 'karargah') {
@@ -1168,7 +1380,7 @@
             const tbody = document.getElementById('approvalTable');
 
             if (pending.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-check-circle"></i><h3>Bekleyen rapor yok</h3><p>Onayınızı bekleyen rapor bulunmuyor.</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-check-circle"></i><h3>Bekleyen rapor yok</h3><p>Onayınızı bekleyen rapor bulunmuyor.</p></div></td></tr>`;
                 return;
             }
 
@@ -1176,6 +1388,7 @@
                 const user = users.find(u => u.id === r.userId);
                 return `
                     <tr>
+                        <td><strong>#${r.id}</strong></td>
                         <td><strong>${user ? user.name : r.name}</strong><br><small style="color:var(--text-secondary)">${r.username}</small></td>
                         <td>${formatDate(r.date)}</td>
                         <td>${r.hours} Saat</td>
@@ -1205,9 +1418,24 @@
                 r.approvedBy = currentUser.username;
                 r.approvedAt = Date.now();
                 saveReports();
-                showToast('success', 'Onaylandı', r.name + ' adlı kullanıcının raporu onaylandı.');
-                renderApproval();
-                renderDashboard();
+
+                const userReports = reports.filter(rep => rep.userId === r.userId && rep.status === 'approved');
+                const reportCount = userReports.length;
+
+                logs.push({
+                    id: Date.now(),
+                    type: 'approve',
+                    reportId: r.id,
+                    reportOwner: r.name,
+                    reportOwnerUser: r.username,
+                    actionBy: currentUser.username,
+                    actionByName: currentUser.name,
+                    reportCount: reportCount,
+                    timestamp: Date.now()
+                });
+                saveLogs();
+
+                showToast('success', 'Onaylandı', `${r.name} adlı kullanıcının #${r.id} nolu raporu onaylandı. (Kişinin ${reportCount}. onaylı raporu)`);
             }
         }
 
@@ -1218,8 +1446,20 @@
                 r.approvedBy = currentUser.username;
                 r.approvedAt = Date.now();
                 saveReports();
-                showToast('info', 'Reddedildi', r.name + ' adlı kullanıcının raporu reddedildi.');
-                renderApproval();
+
+                logs.push({
+                    id: Date.now(),
+                    type: 'reject',
+                    reportId: r.id,
+                    reportOwner: r.name,
+                    reportOwnerUser: r.username,
+                    actionBy: currentUser.username,
+                    actionByName: currentUser.name,
+                    timestamp: Date.now()
+                });
+                saveLogs();
+
+                showToast('info', 'Reddedildi', `${r.name} adlı kullanıcının #${r.id} nolu raporu reddedildi.`);
             }
         }
 
@@ -1278,8 +1518,13 @@
             let filtered = announcements;
 
             if (filter === 'general') filtered = announcements.filter(a => a.scope === 'general');
-            if (filter === 'kurul') filtered = announcements.filter(a => a.scope === 'kurul' && a.kurul === userKurul);
-            if (filter === 'all') filtered = announcements.filter(a => a.scope === 'general' || a.kurul === userKurul);
+            else if (filter === 'kurul') filtered = announcements.filter(a => a.scope === 'kurul' && (a.kurul === userKurul || userKurul === 'Tümü'));
+            else if (filter === 'all') {
+                filtered = announcements.filter(a => {
+                    if (a.scope === 'general') return true;
+                    return a.kurul === userKurul || userKurul === 'Tümü';
+                });
+            }
 
             filtered = filtered.sort((a,b) => b.createdAt - a.createdAt);
             const list = document.getElementById('announcementsList');
@@ -1373,13 +1618,117 @@
             renderAnnouncements(annFilter);
         }
 
+        // ================= CHAT =================
+        function initChat() {
+            const userKurul = ROLES[currentUser.role].kurul;
+            const isAdmin = currentUser.role === 'karargah';
+            const tabsContainer = document.getElementById('chatTabs');
+            let tabsHtml = '';
+
+            const availableChannels = isAdmin ? ['AYK', 'ÜYK', 'BYK'] : [userKurul];
+
+            availableChannels.forEach(ch => {
+                const active = currentChatChannel === ch || (!currentChatChannel && ch === availableChannels[0]) ? 'active' : '';
+                if (!currentChatChannel && ch === availableChannels[0]) currentChatChannel = ch;
+                tabsHtml += `<button class="chat-tab ${active}" onclick="switchChatChannel('${ch}')"><i class="fas ${CHAT_CHANNELS[ch].icon}"></i> ${CHAT_CHANNELS[ch].label}</button>`;
+            });
+
+            tabsContainer.innerHTML = tabsHtml;
+            renderChatMessages();
+        }
+
+        function switchChatChannel(channel) {
+            currentChatChannel = channel;
+            initChat();
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessages');
+            if (!currentChatChannel) return;
+
+            const messages = chats[currentChatChannel] || [];
+            if (messages.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="padding: 40px 20px;"><i class="fas fa-comments"></i><h3>Henüz mesaj yok</h3><p>İlk mesajı siz gönderin.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = messages.map(m => {
+                const isOwn = m.userId === currentUser.id;
+                const user = users.find(u => u.id === m.userId);
+                return `
+                    <div class="chat-message ${isOwn ? 'own' : 'other'}">
+                        <div class="chat-meta">
+                            <span>${user ? user.name : 'Bilinmiyor'}</span>
+                            <span>${formatDateTime(m.timestamp)}</span>
+                        </div>
+                        <div>${escapeHtml(m.text)}</div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatChannel) return;
+
+            if (!chats[currentChatChannel]) chats[currentChatChannel] = [];
+            chats[currentChatChannel].push({
+                id: Date.now(),
+                userId: currentUser.id,
+                text: text,
+                timestamp: Date.now()
+            });
+            saveChats();
+            input.value = '';
+            renderChatMessages();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ================= LOGS =================
+        function renderLogs() {
+            const container = document.getElementById('logsContainer');
+            const sortedLogs = [...logs].sort((a,b) => b.timestamp - a.timestamp);
+            if (sortedLogs.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-history"></i><h3>Henüz log yok</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = sortedLogs.map(l => `
+                <div class="log-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>
+                            <strong style="color: ${l.type === 'approve' ? 'var(--success)' : 'var(--danger)'}">
+                                ${l.type === 'approve' ? 'ONAYLANDI' : 'REDDEDİLDİ'}
+                            </strong>
+                            &mdash; Rapor #${l.reportId}
+                        </span>
+                        <span class="badge ${l.type === 'approve' ? 'badge-approved' : 'badge-rejected'}">
+                            ${l.type === 'approve' ? 'Onay' : 'Red'}
+                        </span>
+                    </div>
+                    <div style="margin-top:8px; color: var(--text-secondary);">
+                        <i class="fas fa-user"></i> ${l.reportOwner} (${l.reportOwnerUser}) 
+                        &mdash; İşlem yapan: <strong>${l.actionByName}</strong> (${l.actionBy})
+                        ${l.reportCount ? `<span style="color:var(--accent-light); margin-left:8px;">(Kişinin ${l.reportCount}. onaylı raporu)</span>` : ''}
+                    </div>
+                    <div class="log-time"><i class="fas fa-clock"></i> ${formatDateTime(l.timestamp)}</div>
+                </div>
+            `).join('');
+        }
+
         // ================= ADMIN =================
         function renderAdmin() {
             const tbody = document.getElementById('usersTable');
             tbody.innerHTML = users.map(u => `
                 <tr>
-                    <td><strong>${u.username}</strong></td>
-                    <td>${u.name}</td>
+                    <td><strong>${u.username}</strong><br><small style="color:var(--text-secondary)">${u.name}</small></td>
                     <td><span class="badge ${u.role === 'karargah' ? 'badge-approved' : (u.role.includes('sorumlu') ? 'badge-pending' : '')}">${ROLES[u.role].label}</span></td>
                     <td>${ROLES[u.role].kurul}</td>
                     <td>
@@ -1396,7 +1745,6 @@
         function addUser(e) {
             e.preventDefault();
             const username = document.getElementById('newUserUsername').value.trim();
-            const name = document.getElementById('newUserName').value.trim();
             const role = document.getElementById('newUserRole').value;
 
             if (!username.startsWith('@')) {
@@ -1421,6 +1769,7 @@
                 }
             }
 
+            const name = username.replace('@', '');
             users.push({
                 id: Date.now(),
                 username,
@@ -1430,9 +1779,10 @@
                 createdAt: Date.now()
             });
             saveUsers();
-            showToast('success', 'Kullanıcı Eklendi', name + ' başarıyla eklendi. Varsayılan şifre: 1234');
+            showToast('success', 'Kullanıcı Eklendi', `${name} başarıyla eklendi. Varsayılan şifre: 1234`);
             renderAdmin();
             document.getElementById('addUserForm').reset();
+            document.getElementById('adminUserCheck').innerHTML = '';
         }
 
         function deleteUser(id) {
@@ -1449,6 +1799,9 @@
             if (!r) return;
 
             const user = users.find(u => u.id === r.userId);
+            const userReports = reports.filter(rep => rep.userId === r.userId).sort((a,b) => a.createdAt - b.createdAt);
+            const reportOrder = userReports.findIndex(rep => rep.id === id) + 1;
+
             const canAction = (currentUser.role === 'karargah' || 
                 (ROLES[currentUser.role].level >= 3 && ROLES[currentUser.role].kurul === r.kurul)) 
                 && r.status === 'pending';
@@ -1466,7 +1819,7 @@
                         ${r.status === 'approved' ? 'Onaylandı' : (r.status === 'rejected' ? 'Reddedildi' : 'Bekliyor')}
                     </span>
                     <span style="color: var(--text-secondary); font-size: 13px; margin-left: 12px;">
-                        ${formatDate(r.date)} &bull; ${r.hours} Saat
+                        Rapor ID: <strong>#${r.id}</strong> &bull; ${reportOrder}. Rapor &bull; ${formatDate(r.date)} &bull; ${r.hours} Saat
                     </span>
                 </div>
                 <div class="form-group">
@@ -1546,19 +1899,26 @@
             }, 4000);
         }
 
-        // Close modal on overlay click
         document.querySelectorAll('.modal-overlay').forEach(el => {
             el.addEventListener('click', function(e) { 
                 if (e.target === this) this.classList.remove('active'); 
             });
         });
 
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#regUsername') && !e.target.closest('#regAutocomplete')) {
+                const dd = document.getElementById('regAutocomplete');
+                if (dd) dd.classList.add('hidden');
+            }
+            if (!e.target.closest('#newUserUsername') && !e.target.closest('#adminAutocomplete')) {
+                const dd = document.getElementById('adminAutocomplete');
+                if (dd) dd.classList.add('hidden');
+            }
+        });
+
         // ================= INIT =================
-        // Reset localStorage to ensure fresh data (remove this line after first use if you want persistence)
-        localStorage.removeItem('rp_users');
-        localStorage.removeItem('rp_reports');
-        localStorage.removeItem('rp_announcements');
         initData();
     </script>
 </body>
-    </html>
+</html>
+
