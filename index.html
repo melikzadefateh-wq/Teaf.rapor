@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANA KARARGAH</title>
+    <title>V2 RP KURUL PANELİ</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -455,7 +455,7 @@
     <!-- AUTH -->
     <div class="auth-container" id="authContainer">
         <div class="auth-box glass">
-            <div class="auth-title">Ana Karargah</div>
+            <div class="auth-title">V2 RP KURUL PANELİ</div>
             <div class="auth-subtitle">Hesabınıza giriş yapın veya kayıt olun</div>
 
             <div class="auth-tabs">
@@ -484,8 +484,8 @@
                     <div class="hint-text">Kamptaki isminizle aynı olsun</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Ad Soyad</label>
-                    <input type="text" class="form-input" id="regName" placeholder="Adınız ve soyadınız" required>
+                    <label class="form-label">Roblox Nickname</label>
+                    <input type="text" class="form-input" id="regName" placeholder="Roblox kullanıcı adınız" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Şifre</label>
@@ -511,7 +511,7 @@
     <div class="app-container" id="appContainer">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-shield-halved"></i>Ana Karargah</div>
+                <div class="logo"><i class="fas fa-shield-halved"></i> V2 RP KURUL</div>
             </div>
 
             <nav class="nav-menu">
@@ -585,7 +585,7 @@
                         <div class="form-group">
                             <label class="form-label">Rapor Tarihi</label>
                             <input type="date" class="form-input" id="reportDate" required>
-                            <div class="hint-text">Sadece son 30 gün içindeki tarihleri seçebilirsiniz.</div>
+                            <div class="hint-text">Sadece son 30 gün içindeki tarihleri seçebilirsiniz. Raporlar sadece 21:00-22:00 arasında atılabilir.</div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Aktif Kalınan Süre</label>
@@ -714,8 +714,8 @@
                             <input type="text" class="form-input" id="newUserUsername" placeholder="@kullanici" required>
                         </div>
                         <div>
-                            <label class="form-label">Ad Soyad</label>
-                            <input type="text" class="form-input" id="newUserName" placeholder="Ad Soyad" required>
+                            <label class="form-label">Roblox Nickname</label>
+                            <input type="text" class="form-input" id="newUserName" placeholder="Roblox Nickname" required>
                         </div>
                         <div>
                             <label class="form-label">Rol</label>
@@ -1066,6 +1066,18 @@
 
         function submitReport(e) {
             e.preventDefault();
+
+            // Saat kısıtlaması: Sadece 21:00-22:00 arası rapor atılabilir
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTime = currentHour + (currentMinute / 60);
+
+            if (currentTime < 21 || currentTime >= 22) {
+                showToast('error', 'Saat Kısıtlaması', 'Raporlar sadece 21:00 - 22:00 arasında atılabilir! Şu anki saat: ' + currentHour.toString().padStart(2, '0') + ':' + currentMinute.toString().padStart(2, '0'));
+                return;
+            }
+
             const date = document.getElementById('reportDate').value;
             const hours = document.getElementById('reportHours').value;
             const icraatText = document.getElementById('reportIcraat').value;
@@ -1549,4 +1561,4 @@
         initData();
     </script>
 </body>
-</html>
+    </html>
