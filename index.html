@@ -1751,10 +1751,8 @@
                 showToast('error', 'Hata', 'Kullanıcı adı @ ile başlamalıdır.');
                 return;
             }
-            if (users.find(u => u.username === username)) {
-                showToast('error', 'Hata', 'Bu kullanıcı adı zaten mevcut.');
-                return;
-            }
+
+            const existingUser = users.find(u => u.username === username);
 
             if (currentUser.role !== 'karargah') {
                 const userKurul = ROLES[currentUser.role].kurul;
@@ -1767,6 +1765,16 @@
                     showToast('error', 'Yetkisiz', 'Sorumlu atama yetkiniz yok.');
                     return;
                 }
+            }
+
+            if (existingUser) {
+                existingUser.role = role;
+                saveUsers();
+                showToast('success', 'Rol Güncellendi', `${existingUser.name} (${existingUser.username}) kullanıcısının rolü "${ROLES[role].label}" olarak güncellendi.`);
+                renderAdmin();
+                document.getElementById('addUserForm').reset();
+                document.getElementById('adminUserCheck').innerHTML = '';
+                return;
             }
 
             const name = username.replace('@', '');
@@ -1921,4 +1929,3 @@
     </script>
 </body>
 </html>
-
